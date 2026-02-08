@@ -18,6 +18,22 @@
       "step": 0.5
     }
   },
+  "settings": [
+    {
+      "id": "pollingEnabled",
+      "type": "boolean",
+      "title": "deviceSettings.pollingEnabled",
+      "default": false
+    },
+    {
+      "id": "pollingInterval",
+      "type": "number",
+      "title": "deviceSettings.pollingInterval",
+      "description": "deviceSettings.pollingIntervalDesc",
+      "min": 20,
+      "default": 30
+    }
+  ],
   "pair": [
     {
       "id": "list_devices",

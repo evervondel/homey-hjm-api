@@ -24,7 +24,9 @@ class HjmApiApp extends Homey.App {
   }
 
   createClient() {
-    return new HjmClient(this.getConfig());
+    const cfg = this.getConfig();
+    const debug = !!this.homey.settings.get('debugRest');
+    return new HjmClient(Object.assign({}, cfg, { debug, logger: this.log.bind(this) }));
   }
 }
 

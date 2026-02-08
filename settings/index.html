@@ -27,6 +27,12 @@
   <label data-i18n="settings.password">Password</label>
   <input id="password" type="password" placeholder="••••••" />
 
+  <label data-i18n="settings.debugRest">Log REST requests</label>
+  <label style="font-weight:normal; display:flex; align-items:center; gap:8px; margin-top:6px;">
+    <input id="debugRest" type="checkbox" />
+    <span data-i18n="settings.debugHint">Enable detailed REST request/response logging (masks auth tokens)</span>
+  </label>
+
   <button id="save" data-i18n="settings.save">Save</button>
   <div class="hint" data-i18n="settings.hint">Tip: values are stored locally on Homey (ManagerSettings).</div>
 
@@ -39,6 +45,7 @@
         document.getElementById('clientSecret').value = settings.clientSecret || '';
         document.getElementById('username').value = settings.username || '';
         document.getElementById('password').value = settings.password || '';
+        document.getElementById('debugRest').checked = !!settings.debugRest;
 
         Homey.ready();
       });
@@ -53,6 +60,7 @@
         Homey.set('clientSecret', clientSecret, function(err){ if(err) return Homey.alert(err); });
         Homey.set('username', username, function(err){ if(err) return Homey.alert(err); });
         Homey.set('password', password, function(err){ if(err) return Homey.alert(err); });
+        Homey.set('debugRest', document.getElementById('debugRest').checked, function(err){ if(err) return Homey.alert(err); });
 
         Homey.alert(Homey.__('settings.saved'));
       });

@@ -9,30 +9,85 @@ class ThermostatDevice extends Homey.Device {
 
     this.log(`Init HJM thermostat devId=${this.devId} (fixed htr/2)`);
 
+    this._pollTimer = null;
+    this._pollIntervalMs = null;
+
     // On-demand refresh button capability
     this.registerCapabilityListener('button.refresh', async () => {
       await this.refreshNow();
+      return true;
     });
 
     // Change setpoint (manual mode only)
     this.registerCapabilityListener('target_temperature', async (value) => {
       await this._setTargetTemperature(value);
       await this.refreshNow();
+      return true;
     });
 
     // Change mode
     this.registerCapabilityListener('thermostat_mode', async (value) => {
       await this._setMode(value);
       await this.refreshNow();
+      return true;
     });
 
     // Initial refresh only (no polling)
     await this.refreshNow();
+
+    this._setupPollingFromSettings();
+    this.on('settings', (newSettings) => this._setupPollingFromSettings(newSettings));
+    // Lifecycle handlers: ensure polling stops immediately on device uninit/delete
+    this.on('uninit', () => this._stopPolling());
+    this.on('deleted', () => this._stopPolling());
+    // Ensure immediate handling for settings changes (SDK compatibility)
+    if (typeof this.onSettings !== 'function') {
+      this.onSettings = (newSettings) => this._setupPollingFromSettings(newSettings);
+    }
   }
+
+  
 
   // Public: refresh on demand
   async refreshNow() {
     await this._refresh();
+  }
+
+  _setupPollingFromSettings(settings) {
+    try {
+      const s = settings || (typeof this.getSettings === 'function' ? this.getSettings() : {}) || {};
+      const enabled = !!s.pollingEnabled;
+      let interval = Number(s.pollingInterval || 0) || 30;
+      if (interval < 20) interval = 20;
+      const intervalMs = Math.max(20000, Math.round(interval) * 1000);
+
+      if (enabled) {
+        if (this._pollTimer && this._pollIntervalMs === intervalMs) return;
+        this._startPolling(intervalMs);
+      } else {
+        this._stopPolling();
+      }
+    } catch (err) {
+      this.error(err);
+    }
+  }
+
+  _startPolling(intervalMs) {
+    this._stopPolling();
+    this._pollIntervalMs = intervalMs;
+    this.log(`Starting polling every ${Math.round(intervalMs/1000)}s`);
+    this._pollTimer = setInterval(() => {
+      this.refreshNow().catch(err => this.error(err));
+    }, intervalMs);
+  }
+
+  _stopPolling() {
+    if (this._pollTimer) {
+      clearInterval(this._pollTimer);
+      this._pollTimer = null;
+      this.log('Stopped polling');
+    }
+    this._pollIntervalMs = null;
   }
 
   // Public: Flow action helpers

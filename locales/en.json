@@ -8,6 +8,13 @@
     "save": "Save",
     "saved": "Saved!",
     "hint": "Tip: values are stored locally on Homey (ManagerSettings)."
+    ,"debugRest": "Log REST requests",
+    "debugHint": "Enable detailed REST request/response logging (masks auth tokens)"
+  },
+  "deviceSettings": {
+    "pollingEnabled": "Enable polling",
+    "pollingInterval": "Polling interval (seconds)",
+    "pollingIntervalDesc": "Minimum 20 seconds. Default 30 seconds."
   },
   "errors": {
     "temp_manual_only": "Temperature can only be set in manual mode."

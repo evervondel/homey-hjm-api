@@ -8,6 +8,13 @@
     "save": "Opslaan",
     "saved": "Opgeslagen!",
     "hint": "Tip: waarden worden lokaal op Homey opgeslagen (ManagerSettings)."
+    ,"debugRest": "Log REST-aanvragen",
+    "debugHint": "Schakel uitgebreide REST request/response logging in (verbergt auth-tokens)"
+  },
+  "deviceSettings": {
+    "pollingEnabled": "Polling inschakelen",
+    "pollingInterval": "Polling-interval (seconden)",
+    "pollingIntervalDesc": "Minimaal 20 seconden. Standaard 30 seconden."
   },
   "errors": {
     "temp_manual_only": "Temperatuur kan enkel ingesteld worden in manual modus."
