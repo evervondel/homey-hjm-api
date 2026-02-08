@@ -1,6 +1,8 @@
 # homey-hjm-api (Homey App)
 
-Homey app (Apps SDK v3) for HJM SmartBox thermostats using REST only (on-demand refresh, no polling).
+![Thermostat Icon](drivers/thermostat/assets/icon.svg)
+
+Homey app (Apps SDK v2) for HJM SmartBox thermostats using REST API.
 
 ## Manual-only setpoint
 
