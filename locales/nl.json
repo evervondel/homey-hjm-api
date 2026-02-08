@@ -1,0 +1,15 @@
+{
+  "settings": {
+    "title": "HJM API instellingen",
+    "clientId": "Client ID",
+    "clientSecret": "Client Secret",
+    "username": "User e-mail",
+    "password": "Wachtwoord",
+    "save": "Opslaan",
+    "saved": "Opgeslagen!",
+    "hint": "Tip: waarden worden lokaal op Homey opgeslagen (ManagerSettings)."
+  },
+  "errors": {
+    "temp_manual_only": "Temperatuur kan enkel ingesteld worden in manual modus."
+  }
+}

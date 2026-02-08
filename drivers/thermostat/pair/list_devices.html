@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="/homey.js" data-origin="pairing"></script>
+  </head>
+  <body>
+    <h1>Select a device</h1>
+    <ul id="devices"></ul>
+
+    <script>
+      Homey.emit('list_devices', {}, function (err, devices) {
+        if (err) return Homey.alert(err.message);
+
+        const ul = document.getElementById('devices');
+
+        devices.forEach(device => {
+          const li = document.createElement('li');
+          li.textContent = device.name;
+          li.onclick = () => Homey.addDevice(device);
+          ul.appendChild(li);
+        });
+      });
+    </script>
+  </body>
+</html>

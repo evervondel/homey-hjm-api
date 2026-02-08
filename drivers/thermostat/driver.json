@@ -1,0 +1,27 @@
+{
+  "id": "thermostat",
+  "name": {
+    "en": "HJM Thermostat",
+    "nl": "HJM Thermostaat"
+  },
+  "class": "thermostat",
+  "capabilities": [
+    "measure_temperature",
+    "target_temperature",
+    "thermostat_mode",
+    "button.refresh"
+  ],
+  "capabilitiesOptions": {
+    "target_temperature": {
+      "min": 5,
+      "max": 30,
+      "step": 0.5
+    }
+  },
+  "pair": [
+    {
+      "id": "list_devices",
+      "template": "list_devices"
+    }
+  ]
+}

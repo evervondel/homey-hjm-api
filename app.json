@@ -1,0 +1,90 @@
+{
+  "id": "be.vervondel.hjm-api",
+  "version": "0.0.6",
+  "sdk": 2,
+  "compatibility": ">=2.0.0",
+  "platforms": ["local"],
+  "name": {
+    "en": "HJM API",
+    "nl": "HJM API"
+  },
+  "description": {
+    "en": "HJM SmartBox integration via REST (on-demand refresh)",
+    "nl": "Integratie met HJM SmartBox via REST (refresh op aanvraag)"
+  },
+  "images": {
+    "large": "assets/images/large.png",
+    "small": "assets/images/small.png"
+  },
+  "category": "climate",
+  "permissions": [],
+  "drivers": [
+    {
+      "id": "thermostat",
+      "name": {
+        "en": "HJM Thermostat",
+        "nl": "HJM Thermostaat"
+      },
+      "class": "thermostat",
+      "capabilities": [
+        "measure_temperature",
+        "target_temperature",
+        "thermostat_mode",
+        "button.refresh"
+      ]
+    }
+  ],
+  "flow": {
+    "actions": [
+      {
+        "id": "refresh_device",
+        "title": {
+          "en": "Refresh device",
+          "nl": "Vernieuw apparaat"
+        }
+      },
+      {
+        "id": "set_mode",
+        "title": {
+          "en": "Set thermostat mode",
+          "nl": "Zet thermostaatmodus"
+        },
+        "args": [
+          {
+            "name": "mode",
+            "type": "dropdown",
+            "title": {
+              "en": "Mode",
+              "nl": "Modus"
+            },
+            "values": [
+              { "id": "auto", "title": { "en": "Auto", "nl": "Auto" } },
+              { "id": "manual", "title": { "en": "Manual", "nl": "Handmatig" } },
+              { "id": "off", "title": { "en": "Off", "nl": "Uit" } }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "set_temperature",
+        "title": {
+          "en": "Set target temperature",
+          "nl": "Stel doeltemperatuur in"
+        },
+        "args": [
+          {
+            "name": "temperature",
+            "type": "number",
+            "title": {
+              "en": "Temperature",
+              "nl": "Temperatuur"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "author": {
+    "name": "Erwin Vervondel"
+  }
+}

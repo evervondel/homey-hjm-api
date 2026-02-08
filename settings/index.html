@@ -1,0 +1,62 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>HJM API Settings</title>
+  <script type="text/javascript" src="/homey.js" data-origin="settings"></script>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; padding: 16px; }
+    label { display:block; margin-top: 12px; font-weight: 600; }
+    input { width: 100%; padding: 8px; font-size: 14px; box-sizing: border-box; }
+    button { margin-top: 16px; padding: 10px 14px; font-size: 14px; }
+    .hint { color: #666; font-size: 12px; margin-top: 4px; }
+  </style>
+</head>
+<body>
+  <h2 data-i18n="settings.title">HJM API Settings</h2>
+
+  <label data-i18n="settings.clientId">Client ID</label>
+  <input id="clientId" type="text" placeholder="54bccbfb..." />
+
+  <label data-i18n="settings.clientSecret">Client Secret</label>
+  <input id="clientSecret" type="password" placeholder="••••••" />
+
+  <label data-i18n="settings.username">User e-mail</label>
+  <input id="username" type="text" placeholder="user@example.com" />
+
+  <label data-i18n="settings.password">Password</label>
+  <input id="password" type="password" placeholder="••••••" />
+
+  <button id="save" data-i18n="settings.save">Save</button>
+  <div class="hint" data-i18n="settings.hint">Tip: values are stored locally on Homey (ManagerSettings).</div>
+
+  <script>
+    function onHomeyReady(Homey) {
+      Homey.get(function(err, settings) {
+        if (err) return Homey.alert(err);
+
+        document.getElementById('clientId').value = settings.clientId || '';
+        document.getElementById('clientSecret').value = settings.clientSecret || '';
+        document.getElementById('username').value = settings.username || '';
+        document.getElementById('password').value = settings.password || '';
+
+        Homey.ready();
+      });
+
+      document.getElementById('save').addEventListener('click', function() {
+        const clientId = document.getElementById('clientId').value.trim();
+        const clientSecret = document.getElementById('clientSecret').value.trim();
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value;
+
+        Homey.set('clientId', clientId, function(err){ if(err) return Homey.alert(err); });
+        Homey.set('clientSecret', clientSecret, function(err){ if(err) return Homey.alert(err); });
+        Homey.set('username', username, function(err){ if(err) return Homey.alert(err); });
+        Homey.set('password', password, function(err){ if(err) return Homey.alert(err); });
+
+        Homey.alert(Homey.__('settings.saved'));
+      });
+    }
+  </script>
+</body>
+</html>

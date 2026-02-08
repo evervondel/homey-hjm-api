@@ -1,0 +1,13 @@
+{
+  "name": "homey-hjm-api",
+  "version": "0.0.6",
+  "main": "app.js",
+  "dependencies": {
+    "node-fetch": "2.6.7"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/evervondel/homey-hjm-api.git"
+  }
+}
