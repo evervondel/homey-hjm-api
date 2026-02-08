@@ -1,0 +1,44 @@
+# Dependencies
+node_modules/
+package-lock.json
+yarn.lock
+
+# Homey app build/run artifacts
+.ares/
+build/
+dist/
+*.homeyapp
+
+# Environment & credentials (IMPORTANT: never commit secrets)
+.env
+.env.local
+.env.*.local
+.homeyrc.json
+credentials.json
+
+# IDE & editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+*.iml
+.DS_Store
+
+# OS
+Thumbs.db
+.DS_Store
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Temporary files
+*.tmp
+*.temp
+*~
+.tern-port
+
+# Homey specific
+homey-development.json
