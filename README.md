@@ -1,6 +1,6 @@
 # homey-hjm-api (Homey App)
 
-![Thermostat Icon](drivers/thermostat/assets/icon.svg)
+<img src="assets/icon.svg" alt="Thermostat Icon" width="64" height="64" />
 
 Homey app (Apps SDK v2) for HJM SmartBox thermostats using REST API.
 
