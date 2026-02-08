@@ -63,3 +63,9 @@ The list is populated from `GET /api/v2/grouped_devs`.
 - **REST debug logging:** The client now supports detailed request/response logging (auth tokens are masked). Enable via the app setting `debugRest` in the app settings UI. Logs appear in the Homey app log.
 
 - **SDK v2 compliance:** Capability listeners return a boolean result as expected by the SDK, and device lifecycle events (`uninit`/`deleted`) are handled to ensure polling timers are cleaned up.
+
+## License
+
+MIT © 2026 Erwin Vervondel
+
+See [LICENSE](LICENSE) for details.
