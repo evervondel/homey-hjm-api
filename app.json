@@ -17,6 +17,7 @@
     "small": "assets/images/small.png"
   },
   "category": "climate",
+  "brandColor": "#2196F3",
   "permissions": [],
   "drivers": [
     {
@@ -47,6 +48,10 @@
         "thermostat_mode",
         "button.refresh"
       ],
+      "images": {
+        "large": "/drivers/thermostat/assets/images/large.png",
+        "small": "/drivers/thermostat/assets/images/small.png"
+      },
       "capabilitiesOptions": {
         "button.refresh": {
           "title": { "en": "Refresh", "nl": "Vernieuwen" }
@@ -95,6 +100,10 @@
           "en": "Set thermostat mode",
           "nl": "Zet thermostaatmodus"
         },
+        "titleFormatted": {
+          "en": "Set mode to [[mode]]",
+          "nl": "Stel modus in op [[mode]]"
+        },
         "args": [
           {
             "name": "mode",
@@ -116,6 +125,10 @@
         "title": {
           "en": "Set target temperature",
           "nl": "Stel doeltemperatuur in"
+        },
+        "titleFormatted": {
+          "en": "Set temperature to [[temperature]]",
+          "nl": "Stel temperatuur in op [[temperature]]"
         },
         "args": [
           {
