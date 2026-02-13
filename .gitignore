@@ -42,3 +42,7 @@ yarn-error.log*
 
 # Homey specific
 homey-development.json
+
+
+# Added by Homey CLI
+/.homeybuild/

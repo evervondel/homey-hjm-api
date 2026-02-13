@@ -5,28 +5,38 @@ const HjmClient = require('./lib/hjm-client');
 
 class HjmApiApp extends Homey.App {
   async onInit() {
+    super.onInit();
     this.log('homey-hjm-api started');
-
-    // Log when app settings change
-    //this.homey.settings.on('set', (key) => this.log('Setting set:', key));
-    //this.homey.settings.on('unset', (key) => this.log('Setting unset:', key));
   }
 
-  getConfig() {
+getConfig() {
+    // Safety: If this.homey isn't ready, try to use the global Homey.ManagerSettings
+    const settings = this.homey ? this.homey.settings : Homey.ManagerSettings;
+
+    if (!settings) {
+      throw new Error('Homey Settings Manager not available');
+    }
+
     return {
       baseUrl: 'https://api-hjm.helki.com',
       tokenPath: '/client/token',
-      clientId: this.homey.settings.get('clientId'),
-      clientSecret: this.homey.settings.get('clientSecret'),
-      username: this.homey.settings.get('username'),
-      password: this.homey.settings.get('password'),
+      clientId: settings.get('clientId'),
+      clientSecret: settings.get('clientSecret'),
+      username: settings.get('username'),
+      password: settings.get('password'),
     };
   }
 
   createClient() {
     const cfg = this.getConfig();
-    const debug = !!this.homey.settings.get('debugRest');
-    return new HjmClient(Object.assign({}, cfg, { debug, logger: this.log.bind(this) }));
+    // Use the same safety for the debug toggle
+    const settings = this.homey ? this.homey.settings : Homey.ManagerSettings;
+    const debug = !!settings.get('debugRest');
+    
+    return new HjmClient(Object.assign({}, cfg, { 
+      debug, 
+      logger: this.log.bind(this) 
+    }));
   }
 }
 

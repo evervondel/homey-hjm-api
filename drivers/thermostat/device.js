@@ -4,9 +4,26 @@ const Homey = require('homey');
 
 class ThermostatDevice extends Homey.Device {
   async onInit() {
-    this.client = this.homey.app.createClient();
-    this.devId = this.getData().id;
+    super.onInit();
 
+    // In SDK v2, the app instance is globally available at Homey.app 
+    // or through the driver instance.
+    let app = this.homey ? this.homey.app : Homey.app;
+
+    if (!app || typeof app.createClient !== 'function') {
+      this.error('App instance not ready, waiting 2s...');
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Re-check after delay
+      app = this.homey ? this.homey.app : Homey.app;
+    }
+
+    if (!app || typeof app.createClient !== 'function') {
+      this.error('CRITICAL: Could not find app instance to create client.');
+      return; // Stop initialization to prevent further crashes
+    }
+
+    this.client = app.createClient();
+    this.devId = this.getData().id; 
     this.log(`Init HJM thermostat devId=${this.devId} (fixed htr/2)`);
 
     this._pollTimer = null;
@@ -21,6 +38,7 @@ class ThermostatDevice extends Homey.Device {
     // Change setpoint (manual mode only)
     this.registerCapabilityListener('target_temperature', async (value) => {
       await this._setTargetTemperature(value);
+      await this._wait(2000);
       await this.refreshNow();
       return true;
     });
@@ -28,6 +46,7 @@ class ThermostatDevice extends Homey.Device {
     // Change mode
     this.registerCapabilityListener('thermostat_mode', async (value) => {
       await this._setMode(value);
+      await this._wait(2000);
       await this.refreshNow();
       return true;
     });
@@ -36,39 +55,52 @@ class ThermostatDevice extends Homey.Device {
     await this.refreshNow();
 
     this._setupPollingFromSettings();
-    this.on('settings', (newSettings) => this._setupPollingFromSettings(newSettings));
-    // Lifecycle handlers: ensure polling stops immediately on device uninit/delete
-    this.on('uninit', () => this._stopPolling());
-    this.on('deleted', () => this._stopPolling());
-    // Ensure immediate handling for settings changes (SDK compatibility)
-    if (typeof this.onSettings !== 'function') {
-      this.onSettings = (newSettings) => this._setupPollingFromSettings(newSettings);
-    }
   }
 
-  
+  async onSettings(oldSettings, newSettings, changedKeys) {
+    this.log('Settings changed:', changedKeys);
+    this._setupPollingFromSettings(newSettings);
+    return true; // Confirms settings change in UI
+  }
 
-  // Public: refresh on demand
-  async refreshNow() {
-    await this._refresh();
+  // This is called when the app/driver is stopped or the device is disabled
+  onUninit() {
+    this.log('Device uninitializing, stopping polling...');
+    this._stopPolling();
+  }
+
+  // This is called when the device is removed from Homey
+  onDeleted() {
+    this.log('Device deleted, stopping polling...');
+    this._stopPolling();
   }
 
   _setupPollingFromSettings(settings) {
     try {
-      const s = settings || (typeof this.getSettings === 'function' ? this.getSettings() : {}) || {};
-      const enabled = !!s.pollingEnabled;
-      let interval = Number(s.pollingInterval || 0) || 30;
+      // Use passed settings (from onSettings) OR current settings (from onInit)
+      const s = settings || this.getSettings();
+      
+      // Explicitly check for true/false
+      const enabled = s.pollingEnabled === true;
+      let interval = Number(s.pollingInterval) || 30;
       if (interval < 30) interval = 30;
-      const intervalMs = Math.round(interval) * 1000;
+      const intervalMs = interval * 1000;
+
+      this.log(`Polling Setup: Enabled=${enabled}, Interval=${interval}s`);
 
       if (enabled) {
-        if (this._pollTimer && this._pollIntervalMs === intervalMs) return;
+        // Don't restart if nothing changed
+        if (this._pollTimer && this._pollIntervalMs === intervalMs) {
+          this.log('Polling already running with same interval, skipping restart.');
+          return;
+        }
         this._startPolling(intervalMs);
       } else {
+        this.log('Polling should be disabled. Stopping timer.');
         this._stopPolling();
       }
     } catch (err) {
-      this.error(err);
+      this.error('Error in setupPolling:', err);
     }
   }
 
@@ -90,18 +122,30 @@ class ThermostatDevice extends Homey.Device {
     this._pollIntervalMs = null;
   }
 
+  // Public: refresh on demand
+  async refreshNow() {
+    await this._refresh();
+  }
+
+
   // Public: Flow action helpers
   async setModeFromFlow(mode) {
     await this._setMode(mode);
+    await this._wait(2000);
     await this.refreshNow();
   }
 
   async setTemperatureFromFlow(temperature) {
     await this._setTargetTemperature(temperature);
+    await this._wait(2000);
     await this.refreshNow();
   }
 
   // Helpers
+  _wait(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
   _toFloat(x) {
     if (x === null || x === undefined) return null;
     const n = typeof x === 'number' ? x : parseFloat(String(x).replace(',', '.'));
@@ -109,7 +153,9 @@ class ThermostatDevice extends Homey.Device {
   }
 
   _normalizeMode(mode) {
-    if (mode === 'off' || mode === 'manual' || mode === 'auto') return mode;
+    // Map API 'manual' to Homey 'heat' for UI compatibility
+    if (mode === 'manual' || mode === 'heat') return 'heat';
+    if (mode === 'off' || mode === 'auto') return mode;
     return 'auto';
   }
 
@@ -124,9 +170,9 @@ class ThermostatDevice extends Homey.Device {
   async _setTargetTemperature(target) {
     const current = await this._getStatus();
 
-    // Only allow setting the temperature when the device is in manual mode
+    // Only allow setting the temperature when the device is in manual (heat) mode
     const currentMode = this._normalizeMode(current.mode);
-    if (currentMode !== 'manual') {
+    if (currentMode !== 'heat') {
       throw new Error(this.homey.__('errors.temp_manual_only'));
     }
 
@@ -137,18 +183,21 @@ class ThermostatDevice extends Homey.Device {
     };
 
     await this._postStatus(payload);
-    await this.setCapabilityValue('target_temperature', target);
   }
 
   async _setMode(mode) {
-    const apiMode = this._normalizeMode(mode);
+
+    // Map Homey to API modes:
+    // 'heat' (Homey) -> 'manual' (API)
+    // 'off' (Homey) -> 'off' (API)
+    // 'auto' (Homey) -> 'auto' (API)
+    const apiMode = (mode === 'heat' ? 'manual' : (mode === 'off' || mode === 'auto' ? mode : 'auto'));
 
     const payload = {
       mode: apiMode
     };
 
     await this._postStatus(payload);
-    await this.setCapabilityValue('thermostat_mode', apiMode);
   }
 
   async _refresh() {

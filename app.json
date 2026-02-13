@@ -21,16 +21,62 @@
   "drivers": [
     {
       "id": "thermostat",
-      "name": {
-        "en": "HJM Thermostat",
-        "nl": "HJM Thermostaat"
-      },
+      "name": { "en": "HJM Thermostat", "nl": "HJM Thermostaat" },
+      "icon": "/drivers/thermostat/assets/icon.svg",
       "class": "thermostat",
+      "settings": [
+        {
+          "id": "pollingEnabled",
+          "type": "checkbox",
+          "label": { "en": "Enable Polling", "nl": "Polling inschakelen" },
+          "value": false,
+          "hint": { "en": "Automatically update status.", "nl": "Update status automatisch." }
+        },
+        {
+          "id": "pollingInterval",
+          "type": "number",
+          "label": { "en": "Polling Interval (seconds)", "nl": "Polling Interval (seconden)" },
+          "value": 30,
+          "attr": { "min": 30, "max": 3600, "step": 5 },
+          "hint": { "en": "Minimum 30 seconds to prevent API rate limiting.", "nl": "Minimaal 30 seconden om API-blokkades te voorkomen." }
+        }
+      ],
       "capabilities": [
         "measure_temperature",
         "target_temperature",
         "thermostat_mode",
         "button.refresh"
+      ],
+      "capabilitiesOptions": {
+        "button.refresh": {
+          "title": { "en": "Refresh", "nl": "Vernieuwen" }
+        },
+        "target_temperature": {
+          "min": 5,
+          "max": 35,
+          "step": 0.5,
+          "title": { "en": "Target Temperature", "nl": "Doeltemperatuur" }
+        },
+        "thermostat_mode": {
+          "values": [
+            { "id": "off", "title": { "en": "Off", "nl": "Uit" } },
+            { "id": "heat", "title": { "en": "Manual", "nl": "Handmatig" } },
+            { "id": "auto", "title": { "en": "Automatic", "nl": "Automatisch" } }
+          ]
+        }
+      },
+      "pair": [
+        {
+          "id": "list_devices",
+          "template": "list_devices",
+          "navigation": {
+            "next": "add_devices" 
+          }
+        },
+        {
+          "id": "add_devices",
+          "template": "add_devices"
+        }
       ]
     }
   ],
