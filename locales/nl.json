@@ -14,7 +14,7 @@
   "deviceSettings": {
     "pollingEnabled": "Polling inschakelen",
     "pollingInterval": "Polling-interval (seconden)",
-    "pollingIntervalDesc": "Minimaal 20 seconden. Standaard 30 seconden."
+    "pollingIntervalDesc": "Minimaal 30 seconden. Standaard 30 seconden."
   },
   "errors": {
     "temp_manual_only": "Temperatuur kan enkel ingesteld worden in manual modus."

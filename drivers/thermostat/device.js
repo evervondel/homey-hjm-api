@@ -58,8 +58,8 @@ class ThermostatDevice extends Homey.Device {
       const s = settings || (typeof this.getSettings === 'function' ? this.getSettings() : {}) || {};
       const enabled = !!s.pollingEnabled;
       let interval = Number(s.pollingInterval || 0) || 30;
-      if (interval < 20) interval = 20;
-      const intervalMs = Math.max(20000, Math.round(interval) * 1000);
+      if (interval < 30) interval = 30;
+      const intervalMs = Math.round(interval) * 1000;
 
       if (enabled) {
         if (this._pollTimer && this._pollIntervalMs === intervalMs) return;
@@ -141,12 +141,7 @@ class ThermostatDevice extends Homey.Device {
   }
 
   async _setMode(mode) {
-    const current = await this._getStatus();
     const apiMode = this._normalizeMode(mode);
-
-    // Keep setpoint stable when switching modes
-    const currentSet = this._toFloat(current.stemp);
-    const fallbackSet = this.getCapabilityValue('target_temperature') ?? currentSet ?? 20;
 
     const payload = {
       mode: apiMode
