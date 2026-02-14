@@ -35,7 +35,7 @@ class ThermostatDevice extends Homey.Device {
       return true;
     });
 
-    // Change setpoint (manual mode only)
+    // Change setpoint
     this.registerCapabilityListener('target_temperature', async (value) => {
       await this._setTargetTemperature(value);
       await this._wait(2000);
@@ -173,7 +173,7 @@ class ThermostatDevice extends Homey.Device {
     // Only allow setting the temperature when the device is in manual (heat) mode
     const currentMode = this._normalizeMode(current.mode);
     if (currentMode !== 'heat') {
-      throw new Error(this.homey.__('errors.temp_manual_only'));
+      throw new Error(Homey.__('errors.temp_manual_only'));
     }
 
     const payload = {
